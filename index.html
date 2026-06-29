@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>ExerciseAI</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+
+    background:#1d1d1d;
+
+    color:white;
+
+    padding:25px;
+
+}
+
+h1{
+
+    text-align:center;
+
+    margin-bottom:30px;
+
+}
+
+.wrapper{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:flex-start;
+
+    gap:30px;
+
+}
+
+.video-box{
+
+    border:4px solid #444;
+
+}
+
+#video{
+
+    width:800px;
+
+    display:block;
+
+}
+
+.info{
+
+    width:300px;
+
+    background:#2d2d2d;
+
+    padding:20px;
+
+    border-radius:12px;
+
+}
+
+.info h2{
+
+    margin-bottom:20px;
+
+    text-align:center;
+
+}
+
+.row{
+
+    margin-bottom:20px;
+
+}
+
+.label{
+
+    color:#9ad0ff;
+
+    font-weight:bold;
+
+}
+
+.value{
+
+    margin-top:6px;
+
+    font-size:22px;
+
+}
+
+.buttons{
+
+    margin-top:30px;
+
+    display:flex;
+
+    justify-content:center;
+
+    flex-wrap:wrap;
+
+    gap:15px;
+
+}
+
+button{
+
+    padding:12px 25px;
+
+    border:none;
+
+    border-radius:8px;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+}
+
+.start{
+
+    background:#2ecc71;
+
+}
+
+.stop{
+
+    background:#e74c3c;
+
+}
+
+.squat{
+
+    background:#3498db;
+
+}
+
+.curl{
+
+    background:#9b59b6;
+
+}
+
+.reset{
+
+    background:#f39c12;
+
+}
+
+button:hover{
+
+    opacity:0.9;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>ExerciseAI</h1>
+
+<div class="wrapper">
+
+<div class="video-box">
+
+<img
+id="video"
+src="/video_feed">
+
+</div>
+
+<div class="info">
+
+<h2>Status</h2>
+
+<div class="row">
+
+<div class="label">MODE</div>
+
+<div
+id="mode"
+class="value">
+
+SQUAT
+
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="label">
+
+CLASSIFICATION
+
+</div>
+
+<div
+id="classification"
+class="value">
+
+Standing
+
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="label">
+
+ANGLE
+
+</div>
+
+<div
+id="angle"
+class="value">
+
+0°
+
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="label">
+
+REPETITIONS
+
+</div>
+
+<div
+id="reps"
+class="value">
+
+0
+
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="label">
+
+CAMERA
+
+</div>
+
+<div
+id="camera"
+class="value">
+
+Stopped
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="buttons">
+
+<button
+class="start"
+onclick="startCamera()">
+
+Start Camera
+
+</button>
+
+<button
+class="stop"
+onclick="stopCamera()">
+
+Stop Camera
+
+</button>
+
+<button
+class="squat"
+onclick="setMode('squat')">
+
+Squat
+
+</button>
+
+<button
+class="curl"
+onclick="setMode('curl')">
+
+Curl
+
+</button>
+
+<button
+class="reset"
+onclick="resetReps()">
+
+Reset Reps
+
+</button>
+
+</div>
+
+<script>
+
+const video =
+document.getElementById("video");
+
+function startCamera(){
+
+    fetch("/start");
+
+    video.src="/video_feed?"+new Date().getTime();
+
+}
+
+function stopCamera(){
+
+    fetch("/stop");
+
+}
+
+function setMode(mode){
+
+    fetch("/set_mode?mode="+mode);
+
+}
+
+function resetReps(){
+
+    if(document.getElementById("mode").innerText==="SQUAT")
+
+        fetch("/reset_squat");
+
+    else
+
+        fetch("/reset_curl");
+
+}
+
+setInterval(()=>{
+
+fetch("/status")
+
+.then(r=>r.json())
+
+.then(data=>{
+
+document.getElementById("mode").innerHTML=data.mode;
+
+document.getElementById("classification").innerHTML=data.classification;
+
+document.getElementById("angle").innerHTML=data.angle+"°";
+
+document.getElementById("reps").innerHTML=data.reps;
+
+document.getElementById("camera").innerHTML=
+
+data.camera?"Running":"Stopped";
+
+});
+
+},200);
+
+</script>
+
+</body>
+
+</html>
